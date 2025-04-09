@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Deepseek to PDF Pro by Kidus",
+  "version": "2.0",
+  "description": "Premium Deepseek Conversation Exporter",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.deepseek.com/*"],
+      "js": [
+        "jspdf.min.js",
+        "katex.min.js",
+        "svg.js",
+        "tex-svg.js",
+        "html2canvas.min.js",
+        "content.js"
+      ],
+      "css": ["styles.css"]
+    }
+  ],
+  "host_permissions": [
+    "*://*.deepseek.com/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icon16.png",
+        "icon48.png",
+        "icon128.png",
+        "katex.min.js",
+        "katex.min.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

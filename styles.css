@@ -1,0 +1,50 @@
+#deepseek-pdf-pro-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  background: linear-gradient(135deg, #4285f4, #2b6cd4);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#deepseek-pdf-pro-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+#deepseek-pdf-pro-btn:active {
+  transform: translateY(0);
+}
+
+.spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading .spinner {
+  display: block;
+}
+
+.loading .btn-text {
+  display: none;
+}
