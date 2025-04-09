@@ -8,14 +8,14 @@ class ChatToPDF {
     this.init();
   }
 
-  /** Updates the button text to show progress */
+
   updateProgress(percent) {
     if (this.downloadButton) {
       this.downloadButton.textContent = `Processing ${percent}%`;
     }
   }
 
-  /** Generates the PDF */
+  
   async generatePDF() {
     if (this.isProcessing) {
       alert('Already processing, please wait.');
@@ -66,7 +66,7 @@ class ChatToPDF {
     }
   }
 
-  /** Finds the chat container on the page */
+  /** Finds the chat container on the page (original method, untouched) */
   detectChatContainer() {
     const selectors = [
       '[data-chat-container]', '.chat-container', '.conversation',
@@ -81,7 +81,7 @@ class ChatToPDF {
     return null;
   }
 
-  /** Renders math formulas using KaTeX in inline mode */
+  
   async renderMathWithKaTeX(element) {
     if (!window.katex) {
       throw new Error('KaTeX not loaded. Ensure katex.min.js is injected.');
@@ -103,7 +103,7 @@ class ChatToPDF {
     }
   }
 
-  /** Creates the PDF, ensuring content fits with 1-inch margins */
+  
   async createPDF(renderedContainer) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -227,7 +227,7 @@ class ChatToPDF {
     doc.save(`chat-history-${new Date().toISOString().split('T')[0]}.pdf`);
   }
 
-  /** Converts an element to canvas */
+  
   async elementToCanvas(element) {
     try {
       const canvas = await html2canvas(element, {
@@ -244,7 +244,96 @@ class ChatToPDF {
     }
   }
 
-  /** Adds the download button */
+ 
+  async generateTextPDF() {
+    if (this.isProcessing) {
+      alert('Already processing, please wait.');
+      return;
+    }
+    this.isProcessing = true;
+    this.updateProgress(0);
+
+    try {
+      // Use the same chat container detection as the original
+      this.chatContainer = this.detectChatContainer();
+      if (!this.chatContainer) {
+        throw new Error('Chat container not detected.');
+      }
+      this.updateProgress(10);
+
+      // Select message elements using the same selector as the original
+      const messageElements = this.chatContainer.querySelectorAll(
+        '[class*="message"], [data-message], .chat-message, div'
+      );
+
+      // Extract text from messages
+      const messages = [];
+      for (const msgEl of messageElements) {
+        if (!msgEl.textContent.trim() || msgEl.style.display === 'none' || msgEl.style.visibility === 'hidden') {
+          continue;
+        }
+        const isUser = msgEl.closest('.user, .human, [data-user], [class*="user"]') !== null;
+        const label = isUser ? 'User:' : 'Assistant:';
+        const text = msgEl.textContent.trim();
+        messages.push(`${label} ${text}`);
+      }
+      this.updateProgress(50);
+
+      // Create the PDF with jsPDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const margin = 25.4; // 1-inch margin
+      const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPosition = margin + 10;
+
+      // Add title
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Chat History (Text)', margin, margin);
+      yPosition += 5;
+
+      // Add messages as plain text
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      for (const message of messages) {
+        const lines = doc.splitTextToSize(message, pageWidth);
+        for (const line of lines) {
+          if (yPosition + 10 > pageHeight - margin) {
+            doc.addPage();
+            yPosition = margin;
+          }
+          doc.text(line, margin, yPosition);
+          yPosition += 10;
+        }
+        yPosition += 5; // Gap between messages
+      }
+
+      // Add page numbers
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(150);
+        doc.text(`Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+      }
+
+      // Save with a distinct filename
+      doc.save(`chat-history-text-${new Date().toISOString().split('T')[0]}.pdf`);
+      this.updateProgress(100);
+      alert('Chat history (text) saved successfully!');
+    } catch (error) {
+      console.error('Error generating text PDF:', error);
+      alert('Failed to generate text PDF. Check console for details.');
+    } finally {
+      this.isProcessing = false;
+      if (this.downloadButton) {
+        this.downloadButton.textContent = 'Download Chat as PDF';
+      }
+    }
+  }
+
+  /** Adds the download button with choice for math or text */
   injectButton() {
     const button = document.createElement('button');
     button.textContent = 'Download Chat as PDF';
@@ -263,12 +352,19 @@ class ChatToPDF {
       boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
       minWidth: '200px',
     });
-    button.addEventListener('click', () => this.generatePDF());
+    button.addEventListener('click', async () => {
+      const useMath = confirm('Do you want to include math rendering in the PDF? Click OK for math, Cancel for plain text.');
+      if (useMath) {
+        await this.generatePDF();
+      } else {
+        await this.generateTextPDF();
+      }
+    });
     document.body.appendChild(button);
     this.downloadButton = button;
   }
 
-  /** Initializes the extension and loads KaTeX */
+  
   init() {
     console.log('Initializing ChatToPDF extension');
 
