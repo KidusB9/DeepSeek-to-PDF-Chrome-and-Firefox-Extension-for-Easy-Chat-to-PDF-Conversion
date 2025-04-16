@@ -66,7 +66,7 @@ class ChatToPDF {
     }
   }
 
-  /** Finds the chat container on the page (original method, untouched) */
+  
   detectChatContainer() {
     const selectors = [
       '[data-chat-container]', '.chat-container', '.conversation',
@@ -108,19 +108,18 @@ class ChatToPDF {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     
-    // Set 1-inch (25.4 mm) margins
     const margin = 25.4;
     const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin; // 158.2 mm for A4
     const pageHeight = doc.internal.pageSize.getHeight(); // 297 mm for A4
     let yPosition = margin + 10;
 
-    // Add title
+    // title
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Chat History', margin, margin);
     yPosition += 5;
 
-    // Layout constants
+   
     const labelHeight = 5; // mm
     const gap = 5; // mm
     const minImageHeight = 20; // mm, minimum image height to avoid orphaned labels
@@ -137,7 +136,7 @@ class ChatToPDF {
         continue;
       }
 
-      // Ensure valid dimensions
+    
       const rect = msgEl.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) {
         console.warn('Skipping element with zero dimensions:', msgEl);
@@ -254,14 +253,14 @@ class ChatToPDF {
     this.updateProgress(0);
 
     try {
-      // Use the same chat container detection as the original
+      
       this.chatContainer = this.detectChatContainer();
       if (!this.chatContainer) {
         throw new Error('Chat container not detected.');
       }
       this.updateProgress(10);
 
-      // Select message elements using the same selector as the original
+      
       const messageElements = this.chatContainer.querySelectorAll(
         '[class*="message"], [data-message], .chat-message, div'
       );
