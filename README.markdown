@@ -35,7 +35,7 @@
 
 1. Clone or download the repository:
    ```bash
-   git clone https://github.com/KidusB9/Deepseek-AI-Chat-To-PDF.git
+   git clone https://github.com/KidusB9/DeepSeek-to-PDF-Chrome-and-Firefox-Extension-for-Easy-Chat-to-PDF-Conversion.git
    ```
 2. Open Chrome and go to `chrome://extensions/`.
 3. Enable **Developer Mode** (toggle in the top-right corner).
